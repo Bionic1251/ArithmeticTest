@@ -1,0 +1,39 @@
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+s|Button, .timerLabel, .digitResultLabel {
+    color: #777777;
+}
+
+s|TextInput {
+    font-weight: bold;
+    color: #777777;
+}
+
+s|Label, s|TextInput, s|Button {
+    font-size: 30;
+}
+
+.task, .percentResultLabel {
+    color: #008B00;
+}
+
+.rusFlag, .engFlag {
+    skin-class: ClassReference("ImageButtonSkin");
+}
+
+.engFlag {
+    icon: Embed(source = "graphics/eng.png");
+}
+
+.rusFlag {
+    icon: Embed(source = "graphics/rus.png");
+}
+
+.application {
+    source: Embed(source = "graphics/background.jpg");
+}
+
+.answerLabelWrong, .timerLabelFinish {
+    color: #CD0000;
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<s:Label xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		text="{_textValue}"
+		visible="false"
+		styleName="answerLabelWrong"
+		creationComplete="creationComplete()">
+	<fx:Script>
+		<![CDATA[
+		private const DELAY:int = 500;
+
+		private var timer:Timer = new Timer(DELAY);
+
+		[Bindable]
+		private var _textValue:int;
+
+		private function creationComplete():void {
+			timer.addEventListener(TimerEvent.TIMER_COMPLETE, stop);
+		}
+
+		public function set textValue(value:int):void {
+			_textValue = value;
+			timer.stop();
+			timer.repeatCount = 1;
+			visible = true;
+			timer.start();
+		}
+
+		private function stop(event:TimerEvent):void {
+			visible = false;
+		}
+		]]>
+	</fx:Script>
+</s:Label>

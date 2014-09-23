@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:start="com.denis.at.Start.*"
+		xmlns:game="com.denis.at.Game.*"
+		xmlns:finish="com.denis.at.Finish.*"
+		skinClass="com.denis.at.ApplicationSkin"
+		width="800"
+		height="300"
+		addedToStage="creationComplete()">
+	<fx:Style source="../assets/default.css" />
+	<fx:Script>
+		<![CDATA[
+		import com.denis.at.DataStorage;
+		import com.denis.at.FinishEvent;
+		import com.denis.at.Result;
+		import com.denis.at.Start.StartEvent;
+		import com.denis.at.User;
+		import com.denis.at.VKCommunicator;
+
+		import mx.collections.ArrayCollection;
+
+		private const WIDTH:int = 800;
+		private const HEIGHT:int = 300;
+
+		private const startStateName:String = "start";
+		private const gameStateName:String = "game";
+		private const finishStateName:String = "finish";
+
+		[Bindable]
+		private var taskCollection:ArrayCollection = new ArrayCollection();
+
+		private function startHandler(event:StartEvent):void {
+			currentState = gameStateName;
+			gamePanel.start();
+			dataStorage.requestUserBestResult();
+		}
+
+		private function finishHandler(event:FinishEvent):void {
+			currentState = finishStateName;
+			dataStorage.questionCount = finishPanel.questionCount = event.questionCount;
+			dataStorage.rightAnswerCount = finishPanel.rightAnswerCount = event.rightAnswerCount;
+			finishPanel.update();
+		}
+
+		private var vkCommunicator:VKCommunicator;
+		[Bindable]
+		private var dataStorage:DataStorage;
+
+		private function creationComplete():void {
+			vkCommunicator = new VKCommunicator(stage.loaderInfo.parameters as
+					Object);
+			dataStorage = new DataStorage(vkCommunicator);
+		}
+
+		private function aVarClickHandler():void {
+			vkCommunicator.setAppBestResult(showValue, aTI.text);
+		}
+
+		private function aVarIsSet(data:Object):void {
+			TA.text += "appVarIsSet" + "\n";
+		}
+
+		private function uVarIsSet(data:Object):void {
+			TA.text += "userVarIsSet" + "\n";
+		}
+
+		private function aVarGetClickHandler():void {
+			vkCommunicator.getAppBestResult(showValue);
+		}
+
+		private function showValue(data:Object):void {
+			TA.text += "value is " + data + "\n";
+		}
+
+		private function uVarGetClickHandler():void {
+			vkCommunicator.getUserBestResult(showValue);
+		}
+
+		private function uVarClickHandler():void {
+			vkCommunicator.setUserBestResult(showValue, uTI.text);
+
+		}
+
+		private function setUserClickHandler():void {
+			vkCommunicator.setBestUserId(userSet);
+		}
+
+		private function userSet(data:Object):void {
+			TA.text += "user is set" + "\n";
+		}
+
+		private function getUserClickHandler():void {
+			vkCommunicator.getBestUser(getUserHandler);
+		}
+
+		private function getUserHandler(user:User):void {
+			if (user == null) {
+				TA.text += "null" + "\n";
+			} else {
+				TA.text += "user is " + user.firstName + " " + user.lastName +
+						" " +
+						user.uid + "\n";
+			}
+		}
+
+		private function clearUserClickHandler():void {
+			vkCommunicator.clearBestUserId(userClear);
+		}
+
+		private function userClear(data:Object):void {
+			TA.text += "user is cleared" + "\n";
+		}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="start" />
+		<s:State name="game" />
+		<s:State name="finish" />
+	</s:states>
+	<s:Rect width="{WIDTH}"
+			height="{HEIGHT}"
+			visible="false">
+		<s:stroke>
+			<s:SolidColorStroke color="0x000000"
+					weight="2" />
+		</s:stroke>
+	</s:Rect>
+	<start:StartPanel
+			includeIn="start"
+			id="startPanel"
+			width="{WIDTH}"
+			height="{HEIGHT}"
+			start="startHandler(event)" />
+	<game:GamePanel
+			includeIn="game"
+			id="gamePanel"
+			taskCollection="@{taskCollection}"
+			finish="finishHandler(event)"
+			width="{WIDTH}"
+			height="{HEIGHT}" />
+	<finish:FinishPanel
+			start="startHandler(event)"
+			includeIn="finish"
+			id="finishPanel"
+			taskCollection="{taskCollection}"
+			dataStorage="{dataStorage}"
+			width="{WIDTH}"
+			height="{HEIGHT}" />
+	<s:VGroup visible="false">
+		<s:HGroup>
+			<s:Button click="uVarClickHandler()"
+					label="Save uVar" />
+			<s:TextInput id="uTI" />
+			<s:Button click="uVarGetClickHandler()"
+					label="Get uVar" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Button click="aVarClickHandler()"
+					label="Save aVar" />
+			<s:TextInput id="aTI" />
+			<s:Button click="aVarGetClickHandler()"
+					label="Get aVar" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:Button label="setUser"
+					click="setUserClickHandler()" />
+			<s:Button label="getUser"
+					click="getUserClickHandler()" />
+			<s:Button label="clearUser"
+					click="clearUserClickHandler()" />
+		</s:HGroup>
+		<s:TextArea id="TA" />
+	</s:VGroup>
+</s:Application>

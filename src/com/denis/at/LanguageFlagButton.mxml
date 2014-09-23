@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<s:Button xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		styleName.ru_RU="engFlag"
+		styleName.en_US="rusFlag"
+		creationComplete="creationComplete()">
+	<fx:Script>
+		<![CDATA[
+		private const RU_STATE_NAME:String = "en_US";
+		private const ENG_STATE_NAME:String = "ru_RU";
+
+		private function creationComplete():void {
+			if (LocaleSetter.getCurrentLocale() == RU_STATE_NAME) {
+				currentState = RU_STATE_NAME;
+			} else {
+				currentState = ENG_STATE_NAME;
+			}
+		}
+
+		override protected function clickHandler(event:MouseEvent):void {
+			super.clickHandler(event);
+			if (currentState == ENG_STATE_NAME) {
+				setStateAndLocale(RU_STATE_NAME);
+			} else {
+				setStateAndLocale(ENG_STATE_NAME);
+			}
+		}
+
+		private function setStateAndLocale(name:String):void {
+			currentState = name;
+			LocaleSetter.setCurrentLocale(name);
+		}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="en_US" />
+		<s:State name="ru_RU" />
+	</s:states>
+</s:Button>

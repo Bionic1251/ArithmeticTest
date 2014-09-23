@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:at="com.denis.at.*"
+		xmlns:formatters="mx.formatters.*"
+		xmlns:controls="mx.controls.*"
+		height="100%"
+		width="100%">
+
+	<fx:Script>
+		<![CDATA[
+		import com.denis.at.DataStorage;
+		import com.denis.at.LocaleResource;
+		import com.denis.at.Start.StartEvent;
+		import com.denis.at.vkTest.LogTitleWindow;
+
+		import mx.collections.ArrayCollection;
+		import mx.managers.PopUpManager;
+
+		[Bindable]
+		public var rightAnswerCount:int;
+		[Bindable]
+		public var questionCount:int;
+
+		[Bindable]
+		public var taskCollection:ArrayCollection;
+
+		[Bindable]
+		public var dataStorage:DataStorage;
+
+		public function update():void {
+			dataStorage.update();
+		}
+
+		private function againClickHandler():void {
+			dispatchEvent(new StartEvent(StartEvent.START));
+		}
+
+		private function openNewWin():void {
+			var urlReq:URLRequest = new URLRequest("id" +
+					dataStorage.bestUser.uid);
+			navigateToURL(urlReq, "_blank");
+		}
+
+		private function showLogButtonClick():void {
+			var titleWindow:LogTitleWindow = new LogTitleWindow();
+			titleWindow.taskCollection = taskCollection;
+			PopUpManager.addPopUp(titleWindow, this);
+		}
+		]]>
+	</fx:Script>
+	<fx:Metadata>
+		[Event(name="start", type="com.denis.at.Start.StartEvent")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<formatters:NumberFormatter precision="0"
+				id="formatter"
+				rounding="nearest" />
+	</fx:Declarations>
+	<at:TimerLanguagePanel height="20%"
+			width="100%" />
+	<s:VGroup horizontalAlign="center"
+			verticalCenter="0"
+			horizontalCenter="0">
+		<!--<s:Label text="{resourceManager.getString(LocaleResource.RESOURCE_NAME, 'result_answer')}" />-->
+		<s:Label text="Ваш результат: {rightAnswerCount} / {questionCount}"
+				styleName="digitResultLabel" />
+		<s:Label text="Ваш лучший результат: {dataStorage.userRightAnswerCount} / {dataStorage.userQuestionCount}"
+				styleName="digitResultLabel"
+				visible="{dataStorage.userBestResultCome}" />
+		<s:Label text="Лучший результат в приложении"
+				styleName="digitResultLabel" />
+		<s:HGroup visible="{dataStorage.userCome}">
+			<s:Label text="у пользователя"
+					styleName="digitResultLabel" />
+			<controls:LinkButton label="{dataStorage.bestUser.firstName} {dataStorage.bestUser.lastName}"
+					click="openNewWin()" />
+		</s:HGroup>
+		<s:Label text="{dataStorage.appRightAnswerCount} / {dataStorage.appQuestionCount}"
+				styleName="digitResultLabel"
+				visible="{dataStorage.appBestResultCome}" />
+	</s:VGroup>
+	<s:Button bottom="0" right="0" label="showResults" click="showLogButtonClick()"/>
+	<s:Button label="{resourceManager.getString(LocaleResource.RESOURCE_NAME, 'again_button')}"
+			click="againClickHandler()"
+			bottom="0"
+			horizontalCenter="0" />
+</s:Group>

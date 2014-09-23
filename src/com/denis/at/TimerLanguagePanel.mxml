@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:at="com.denis.at.*">
+	<fx:Script>
+		<![CDATA[
+		[Bindable]
+		public var timerShown:Boolean = false;
+		[Bindable]
+		public var timeValue:int;
+
+		public function showStartTime():void {
+			timerLabel.styleName = "timerLabel";
+		}
+
+		public function showFinishTime():void {
+			timerLabel.styleName = "timerLabelFinish";
+		}
+		]]>
+	</fx:Script>
+	<s:Label id="timerLabel"
+			text="{timeValue}"
+			visible="{timerShown}"
+			verticalCenter="0"
+			horizontalCenter="0" />
+	<at:LanguageFlagButton right="10"
+			verticalCenter="0" />
+</s:Group>

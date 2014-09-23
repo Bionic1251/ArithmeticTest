@@ -1,0 +1,7 @@
+<flex-config>
+	<compiler>
+		<source-path append="true">
+    		<path-element>locale/{locale}</path-element>	
+		</source-path>
+	</compiler>
+</flex-config>

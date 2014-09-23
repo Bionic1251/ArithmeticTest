@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		xmlns:at="com.denis.at.*"
+		creationComplete="creationComplete()">
+
+	<fx:Script>
+		<![CDATA[
+		import com.denis.at.FinishEvent;
+		import com.denis.at.LocaleResource;
+		import com.denis.at.QuestionInfo;
+		import com.denis.at.Task;
+		import com.denis.at.TaskGenerator;
+
+		import mx.collections.ArrayCollection;
+
+		private const TIME:int = 3;
+		private const FINISH_TIME:int = 2;
+
+		[Bindable]
+		public var task:String;
+		[Bindable]
+		public var time:int;
+
+		[Bindable]
+		public var taskCollection:ArrayCollection;
+		private var questionInfo:QuestionInfo;
+
+		[Bindable]
+		private var questionCount:int = 0;
+		[Bindable]
+		private var rightAnswerCount:int = 0;
+		private var answer:int;
+		private var timer:Timer = new Timer(1000);
+
+		private function creationComplete():void {
+			timer.addEventListener(TimerEvent.TIMER, tic);
+		}
+
+		public function start():void {
+			taskCollection = new ArrayCollection();
+			timerLanguagePanel.showStartTime();
+			userAnswer.text = "";
+			questionCount = 0;
+			rightAnswerCount = 0;
+			time = TIME;
+			timer.stop();
+			timer.start();
+			setQuestion();
+			userAnswer.setFocus();
+		}
+
+		private function setQuestion():void {
+			var questionInfo:QuestionInfo = TaskGenerator.generateTask();
+			task = questionInfo.question;
+			answer = questionInfo.answer;
+			this.questionInfo = questionInfo;
+			questionCount++;
+		}
+
+		private function tic(event:TimerEvent):void {
+			time--;
+			if (time == FINISH_TIME) {
+				timerLanguagePanel.showFinishTime();
+			}
+			if (!isTimeLeft()) {
+				timer.stop();
+			}
+		}
+
+		private function startClickHandler():void {
+			start();
+		}
+
+		private function answerEnterHandler():void {
+			var userAnswer:int = parseInt(this.userAnswer.text);
+			var task:Task = new Task(questionInfo.question,
+					questionInfo.answer, userAnswer);
+			taskCollection.addItem(task);
+			if (userAnswer == answer) {
+				rightAnswerCount++;
+			} else {
+				if (isTimeLeft()) {
+					blinkingLabel.textValue = answer;
+				}
+			}
+			this.userAnswer.text = "";
+			if (isTimeLeft()) {
+				setQuestion();
+			} else {
+				dispatchEvent(new FinishEvent(FinishEvent.FINISH,
+						questionCount, rightAnswerCount));
+			}
+		}
+
+		private function isTimeLeft():Boolean {
+			return time > 0;
+		}
+
+		private function userAnswerFocusOutHandler():void {
+			userAnswer.setFocus();
+		}
+		]]>
+	</fx:Script>
+	<fx:Metadata>
+		[Event(name="finish", type="com.denis.at.FinishEvent")]
+	</fx:Metadata>
+	<at:TimerLanguagePanel
+			id="timerLanguagePanel"
+			top="0"
+			timerShown="true"
+			timeValue="{time}"
+			height="20%"
+			width="100%" />
+	<s:HGroup gap="5"
+			id="taskGroup"
+			verticalCenter="0"
+			horizontalCenter="0"
+			verticalAlign="top">
+		<s:Group height="100%">
+			<s:Label top="6"
+					styleName="task"
+					text="{task} = " />
+		</s:Group>
+		<s:VGroup id="answerGroup">
+			<s:TextInput id="userAnswer"
+					enter="answerEnterHandler()"
+					widthInChars="2"
+					maxChars="2"
+					restrict="0-9"
+					focusOut="userAnswerFocusOutHandler()" />
+			<at:BlinkingLabel id="blinkingLabel" />
+		</s:VGroup>
+	</s:HGroup>
+	<s:Button label="{resourceManager.getString(LocaleResource.RESOURCE_NAME, 'again_button')}"
+			click="startClickHandler()"
+			bottom="0"
+			horizontalCenter="0" />
+</s:Group>
